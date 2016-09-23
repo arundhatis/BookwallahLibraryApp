@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -25,9 +24,6 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,9 +34,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             IntentIntegrator integrator = new IntentIntegrator(this);
             integrator.initiateScan();
-            //Intent intent = new Intent(ACTION_SCAN);
-            //intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
-            //startActivityForResult(intent, 0);
         } catch (ActivityNotFoundException anfe) {
             anfe.printStackTrace();
             showDialog(MainActivity.this, "No Scanner Found", "Download a scanner code activity?", "Yes", "No").show();
@@ -74,12 +67,12 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
 
-
                 if(scanResult!=null){
                     getBookDetails(scanResult.getContents());
                 }
                 else{
-                    System.out.println("that didnt work");                }
+                    System.out.println("that didnt work");
+                }
 
             }
         }
@@ -99,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
         final TextView bookAuthorsView = (TextView) findViewById(R.id.textView);
         final TextView bookTitleView = (TextView) findViewById(R.id.textView2);
 
-
-
         RequestQueue queue = Volley.newRequestQueue(this);
 
         JsonObjectRequest stringRequest = new JsonObjectRequest(Request.Method.GET, url,
@@ -116,6 +107,9 @@ public class MainActivity extends AppCompatActivity {
                             bookTitleView.setText(bookTitle);
                             bookAuthorsView.setText(bookAuthors);
                         } catch (JSONException e) {
+                            Intent intent = new Intent(MainActivity.this, ManualEntryActivity.class);
+                            startActivity(intent);
+                            finish();
                             e.printStackTrace();
                         }
                     }
@@ -124,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 System.out.println(error);
-                bookTitleView.setText("That didn't work!");
             }
         });
         queue.add(stringRequest);
